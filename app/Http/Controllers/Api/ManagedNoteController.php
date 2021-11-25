@@ -64,7 +64,7 @@ class ManagedNoteController extends Controller
         $note = new ManagedNote();
         $note->text = $request->get('text');
         $note->status = 'INITIALIZED';
-        $note->type = 'FLOW';
+        $note->type = 'ALIVE';
         $note->props = '{}';
         if ($category != null && strlen($category) > 0) {
             $existingCategory = $user->categories()->firstWhere('tag', strtolower($category));
@@ -74,6 +74,7 @@ class ManagedNoteController extends Controller
                     'tag' => strtolower($category)
                 ]);
             }
+            $note->category_id = $existingCategory->id;
         }
         $user->notes()->save($note);
         return [

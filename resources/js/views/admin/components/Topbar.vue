@@ -3,7 +3,7 @@
     <b-navbar-brand href="#">Whats..?</b-navbar-brand>
 
     <b-navbar-nav class="ml-auto">
-      <b-button size="sm" class="my-2 my-sm-0" type="submit" @click="logout"
+      <b-button size="sm" variant="outline-primary text-white" class="my-2 my-sm-0" type="submit" @click="logout"
         >Log out</b-button
       >
     </b-navbar-nav>
