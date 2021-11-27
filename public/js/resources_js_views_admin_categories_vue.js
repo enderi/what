@@ -211,16 +211,30 @@ var render = function() {
           return _c("li", { staticClass: "list-group-item" }, [
             _c("div", { staticClass: "row" }, [
               _c("div", { staticClass: "col-7" }, [
-                _c("small", { staticClass: "text-muted" }, [
-                  _vm._v(
-                    _vm._s(
-                      _vm._f("moment")(category.created_at, "DD.MM.YYYY")
-                    ) +
-                      " | " +
-                      _vm._s(category.notes_count) +
-                      " notes\n                "
-                  )
-                ])
+                _c(
+                  "small",
+                  { staticClass: "text-muted" },
+                  [
+                    _vm._v(
+                      _vm._s(
+                        _vm._f("moment")(category.created_at, "DD.MM.YYYY")
+                      ) + " | "
+                    ),
+                    _c(
+                      "router-link",
+                      {
+                        attrs: {
+                          to: {
+                            name: "show-by-category",
+                            params: { tag: category.tag }
+                          }
+                        }
+                      },
+                      [_vm._v(_vm._s(category.notes_count) + " notes ")]
+                    )
+                  ],
+                  1
+                )
               ]),
               _vm._v(" "),
               _c("div", { staticClass: "col-5 text-right" }),

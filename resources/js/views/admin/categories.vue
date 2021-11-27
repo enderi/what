@@ -9,7 +9,7 @@
         <li v-for="category in categories" class="list-group-item">
           <div class="row">
             <div class="col-7">
-              <small class="text-muted">{{ category.created_at | moment("DD.MM.YYYY") }} | {{ category.notes_count }} notes
+              <small class="text-muted">{{ category.created_at | moment("DD.MM.YYYY") }} | <router-link :to="{name: 'show-by-category', params: { tag: category.tag}}">{{ category.notes_count }} notes </router-link>
                   </small
                 >
             </div>

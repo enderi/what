@@ -64,8 +64,6 @@ class ManagedNoteController extends Controller
 
         $note = new ManagedNote();
         $note->text = $request->get('text');
-        $note->status = 'INITIALIZED';
-        $note->type = 'ALIVE';
         $note->props = '{}';
         $note->uuid = Uuid::uuid4();
         if ($category != null && strlen($category) > 0) {
