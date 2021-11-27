@@ -360,6 +360,9 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
 
 
 
@@ -371,7 +374,7 @@ __webpack_require__.r(__webpack_exports__);
     LogFields: _log_vue__WEBPACK_IMPORTED_MODULE_2__.default
   },
   mounted: function mounted() {
-    console.log("monttu");
+    console.log("monttu", this.$route.params);
     this.loadData();
   },
   data: function data() {
@@ -379,20 +382,31 @@ __webpack_require__.r(__webpack_exports__);
       notes: [],
       categories: [],
       commenting: {},
-      categoryFilter: false
+      categoryFilter: false,
+      tagFilter: null
     };
   },
   computed: {
     filteredNotes: function filteredNotes() {
+      var _this = this;
+
+      this.tagFilter = this.$route.params.tag;
+
+      if (this.$route.params && this.$route.params.tag) {
+        return _.filter(this.notes, function (item) {
+          return item.category && item.category.tag === _this.tagFilter;
+        });
+      }
+
       return this.notes;
     }
   },
   methods: {
     loadData: function loadData() {
-      var _this = this;
+      var _this2 = this;
 
       axios.get("info").then(function (resp) {
-        return _this.parseStuff(resp.data);
+        return _this2.parseStuff(resp.data);
       });
     },
     parseStuff: function parseStuff(data) {
@@ -1200,7 +1214,21 @@ var render = function() {
             staticClass:
               "card-header d-flex justify-content-between align-items-center"
           },
-          [_vm._v("Notes\n      ")]
+          [
+            _vm._v("Notes\n      "),
+            _vm.tagFilter
+              ? _c(
+                  "div",
+                  {},
+                  [
+                    _c("router-link", { attrs: { to: { name: "notes" } } }, [
+                      _vm._v("Show all")
+                    ])
+                  ],
+                  1
+                )
+              : _vm._e()
+          ]
         ),
         _vm._v(" "),
         _c(
@@ -1223,9 +1251,25 @@ var render = function() {
                         ) + "\n                "
                       ),
                       aNote.category
-                        ? _c("span", [
-                            _vm._v("| " + _vm._s(aNote.category.name))
-                          ])
+                        ? _c(
+                            "span",
+                            [
+                              _vm._v("| "),
+                              _c(
+                                "router-link",
+                                {
+                                  attrs: {
+                                    to: {
+                                      name: "show-by-category",
+                                      params: { tag: aNote.category.tag }
+                                    }
+                                  }
+                                },
+                                [_vm._v(" " + _vm._s(aNote.category.name))]
+                              )
+                            ],
+                            1
+                          )
                         : _vm._e()
                     ])
                   ]),

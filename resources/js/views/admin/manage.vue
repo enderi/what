@@ -3,6 +3,9 @@
     <log-fields @saved="noteAdded"></log-fields>
     <div class="card mt-1">
       <div class="card-header d-flex justify-content-between align-items-center">Notes
+        <div class="" v-if="tagFilter">
+          <router-link :to="{name: 'notes'}">Show all</router-link>
+        </div>
         <!-- <b-dropdown id="dropdown-form" text="Filter" ref="dropdown" class="m-2">
            <b-dropdown-form>
               <b-form-checkbox variant="primary" v-model="categoryFilter">By Category</b-form-checkbox>
@@ -19,7 +22,7 @@
               <small class="text-muted"
                   >{{ aNote.created_at | moment("DD.MM.YYYY") }}
                   <span v-if="aNote.category"
-                    >| {{ aNote.category.name }}</span
+                    >| <router-link :to="{name:'show-by-category', params: {tag: aNote.category.tag}}"> {{ aNote.category.name }}</router-link></span
                   ></small
                 >
             </div>
@@ -66,9 +69,8 @@ export default {
     ListComments,
     LogFields,
   },
-
   mounted() {
-    console.log("monttu");
+    console.log("monttu", this.$route.params);
     this.loadData();
   },
   data() {
@@ -76,11 +78,18 @@ export default {
       notes: [],
       categories: [],
       commenting: {},
-      categoryFilter: false
+      categoryFilter: false,
+      tagFilter: null      
     };
   },
   computed: {
     filteredNotes() {
+      this.tagFilter = this.$route.params.tag
+      if(this.$route.params && this.$route.params.tag){
+        return _.filter(this.notes, item => {
+          return item.category && item.category.tag === this.tagFilter
+        })
+      }
       return this.notes
     }
   },

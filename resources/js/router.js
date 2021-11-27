@@ -49,7 +49,16 @@ let router = new Router({
          */
         {
             path: "/notes",
-            name: "manage",
+            name: "notes",
+            component: () => import("./views/admin/manage.vue"),
+            meta: {
+                requiresAuth: true,
+                layout: AdminLayout
+            }
+        },
+        {
+            path: "/notes/by-category/:tag",
+            name: "show-by-category",
             component: () => import("./views/admin/manage.vue"),
             meta: {
                 requiresAuth: true,
