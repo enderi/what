@@ -4,7 +4,9 @@
       type="text"
       class="form-control"
       autofocus
+      :ref="'comment_' + noteId"
       v-model="comment"
+      :id="'comment_'+ noteId"
       placeholder="new comment"
     />
   </form>
@@ -19,6 +21,8 @@ export default {
     return {
       comment: "",
     };
+  },
+  mounted() {
   },
   methods: {
     addComment() {

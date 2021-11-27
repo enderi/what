@@ -23,6 +23,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: {
     noteId: Number
@@ -32,6 +34,7 @@ __webpack_require__.r(__webpack_exports__);
       comment: ""
     };
   },
+  mounted: function mounted() {},
   methods: {
     addComment: function addComment() {
       var self = this;
@@ -66,19 +69,15 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: {
     comments: Array,
     maxRows: Number
+  },
+  computed: {
+    reversed: function reversed() {
+      return this.comments.reverse();
+    }
   },
   data: function data() {
     return {};
@@ -361,43 +360,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 
 
@@ -415,10 +377,15 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       notes: [],
-      activeNotes: [],
       categories: [],
-      commenting: {}
+      commenting: {},
+      categoryFilter: false
     };
+  },
+  computed: {
+    filteredNotes: function filteredNotes() {
+      return this.notes;
+    }
   },
   methods: {
     loadData: function loadData() {
@@ -429,14 +396,8 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     parseStuff: function parseStuff(data) {
-      this.notes = data.notes.filter(function (mn) {
-        return mn.type === "FLOW";
-      });
-      this.activeNotes = data.notes.filter(function (mn) {
-        return mn.type !== "FLOW";
-      });
-      var categories = data.categories;
-      console.log(this.notes, this.activeNotes);
+      this.notes = data.notes;
+      this.categories = data.categories;
     },
     open: function open(note) {//axios.get("note/" + note.id);
     },
@@ -459,22 +420,13 @@ __webpack_require__.r(__webpack_exports__);
       }
     },
     noteAdded: function noteAdded(resp) {
-      console.log(resp);
+      this.commentNote(resp);
       this.loadData();
     },
     reloadComments: function reloadComments(comment, note) {
-      var _this2 = this;
-
       note.comments.push(comment);
-      return;
-      axios.get("notes/" + note.id + "/comments").then(function (resp) {
-        console.log(resp);
-
-        _this2.$set(note, "comments", resp.data);
-      });
     }
-  },
-  computed: {}
+  }
 });
 
 /***/ }),
@@ -947,8 +899,14 @@ var render = function() {
             expression: "comment"
           }
         ],
+        ref: "comment_" + _vm.noteId,
         staticClass: "form-control",
-        attrs: { type: "text", autofocus: "", placeholder: "new comment" },
+        attrs: {
+          type: "text",
+          autofocus: "",
+          id: "comment_" + _vm.noteId,
+          placeholder: "new comment"
+        },
         domProps: { value: _vm.comment },
         on: {
           input: function($event) {
@@ -987,23 +945,12 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c(
     "ul",
-    { staticClass: "list-group list-group-flush" },
-    _vm._l(_vm.comments, function(comment) {
-      return _c("li", { staticClass: "list-group-item" }, [
-        _c("div", { staticClass: "row" }, [
-          _c("div", { staticClass: "col-8" }, [
-            _vm._v("\n        " + _vm._s(comment.text) + "\n      ")
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "col-4" }, [
-            _c("span", { staticClass: "text-right" }, [
-              _c("small", [
-                _vm._v(
-                  _vm._s(_vm._f("moment")(comment.created_at, "YYYY-MM-DD"))
-                )
-              ])
-            ])
-          ])
+    { staticClass: "pb-2" },
+    _vm._l(_vm.reversed, function(comment) {
+      return _c("li", [
+        _vm._v("\n    " + _vm._s(comment.text) + " "),
+        _c("small", { staticClass: "text-muted" }, [
+          _vm._v(_vm._s(_vm._f("moment")(comment.created_at, "YYYY-MM-DD")))
         ])
       ])
     }),
@@ -1244,94 +1191,17 @@ var render = function() {
   return _c(
     "div",
     [
-      _vm._m(0),
-      _vm._v(" "),
       _c("log-fields", { on: { saved: _vm.noteAdded } }),
       _vm._v(" "),
-      _vm.notes && _vm.notes.length > 0
-        ? _c("div", { staticClass: "mb-3" }, [
-            _c(
-              "div",
-              { staticClass: "list-group border border-success" },
-              _vm._l(_vm.notes, function(item) {
-                return _c(
-                  "div",
-                  {
-                    staticClass: "list-group-item list-group-item-action",
-                    attrs: { href: "#", "aria-current": "true" }
-                  },
-                  [
-                    _c("div", { staticClass: "row" }, [
-                      _c("div", { staticClass: "col-8" }, [
-                        _c("div", { staticClass: "text-success" }, [
-                          _vm._v("New item")
-                        ]),
-                        _vm._v(" "),
-                        _c("span", [
-                          _c("small", { staticClass: "text-muted" }, [
-                            _vm._v(
-                              _vm._s(
-                                _vm._f("moment")(item.created_at, "DD.MM.YYYY")
-                              ) + "\n                "
-                            ),
-                            item.category
-                              ? _c("span", [
-                                  _vm._v("| " + _vm._s(item.category.name))
-                                ])
-                              : _vm._e()
-                          ])
-                        ]),
-                        _vm._v(" "),
-                        _c("br"),
-                        _vm._v(" "),
-                        _c("p", { staticClass: "mb1" }, [
-                          _vm._v(
-                            "\n              " +
-                              _vm._s(item.text) +
-                              "\n            "
-                          )
-                        ])
-                      ]),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-4 text-right" }, [
-                        _c(
-                          "a",
-                          {
-                            staticClass:
-                              "btn btn-sm btn-outline-primary text-end",
-                            on: {
-                              click: function($event) {
-                                return _vm.keep(item)
-                              }
-                            }
-                          },
-                          [_c("i", { staticClass: "fa fa-save" })]
-                        ),
-                        _vm._v(" "),
-                        _c(
-                          "a",
-                          {
-                            staticClass: "btn btn-sm btn-outline-danger",
-                            on: {
-                              click: function($event) {
-                                return _vm.forget(item)
-                              }
-                            }
-                          },
-                          [_c("i", { staticClass: "fa fa-times" })]
-                        )
-                      ])
-                    ])
-                  ]
-                )
-              }),
-              0
-            )
-          ])
-        : _vm._e(),
-      _vm._v(" "),
       _c("div", { staticClass: "card mt-1" }, [
-        _c("div", { staticClass: "card-header" }, [_vm._v("Notes")]),
+        _c(
+          "div",
+          {
+            staticClass:
+              "card-header d-flex justify-content-between align-items-center"
+          },
+          [_vm._v("Notes\n      ")]
+        ),
         _vm._v(" "),
         _c(
           "ul",
@@ -1339,94 +1209,98 @@ var render = function() {
             staticClass: "list-group list-group-flush",
             staticStyle: { "max-height": "65vh", "overflow-y": "auto" }
           },
-          _vm._l(_vm.activeNotes, function(aNote) {
-            return _c("li", { staticClass: "list-group-item" }, [
-              _c("div", { staticClass: "row" }, [
-                _c("div", { staticClass: "col-8" }, [
-                  _c("small", { staticClass: "text-muted" }, [
-                    _vm._v(
-                      _vm._s(_vm._f("moment")(aNote.created_at, "DD.MM.YYYY")) +
-                        "\n                "
-                    ),
-                    aNote.category
-                      ? _c("span", [_vm._v("| " + _vm._s(aNote.category.name))])
-                      : _vm._e()
+          _vm._l(_vm.filteredNotes, function(aNote) {
+            return _c(
+              "li",
+              { staticClass: "list-group-item pt-0 pb-0 pl-2 pr-2" },
+              [
+                _c("div", { staticClass: "row" }, [
+                  _c("div", { staticClass: "col-7" }, [
+                    _c("small", { staticClass: "text-muted" }, [
+                      _vm._v(
+                        _vm._s(
+                          _vm._f("moment")(aNote.created_at, "DD.MM.YYYY")
+                        ) + "\n                "
+                      ),
+                      aNote.category
+                        ? _c("span", [
+                            _vm._v("| " + _vm._s(aNote.category.name))
+                          ])
+                        : _vm._e()
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c(
+                    "div",
+                    { staticClass: "col-5 text-right" },
+                    [
+                      _c(
+                        "a",
+                        {
+                          staticClass: "btn btn-link p-1 text-danger",
+                          on: {
+                            click: function($event) {
+                              return _vm.deleteNote(aNote)
+                            }
+                          }
+                        },
+                        [_c("i", { staticClass: "fa fa-times" })]
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "a",
+                        {
+                          staticClass: "btn btn-link p-1",
+                          on: {
+                            click: function($event) {
+                              return _vm.commentNote(aNote)
+                            }
+                          }
+                        },
+                        [_c("i", { staticClass: "fa fa-comment" })]
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "router-link",
+                        {
+                          staticClass: "btn btn-link p-1",
+                          attrs: {
+                            to: { name: "editNote", params: { id: aNote.id } }
+                          }
+                        },
+                        [_c("i", { staticClass: "fa fa-edit" })]
+                      )
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "col-12" }, [
+                    _c("p", [_vm._v(_vm._s(aNote.text))])
                   ])
                 ]),
                 _vm._v(" "),
-                _c("div", { staticClass: "col-4 text-right" }, [
-                  _c(
-                    "a",
-                    {
-                      staticClass: "btn btn-sm btn-link",
-                      on: {
-                        click: function($event) {
-                          return _vm.commentNote(aNote)
-                        }
-                      }
-                    },
-                    [_c("i", { staticClass: "fa fa-comment" })]
-                  ),
-                  _vm._v(" "),
-                  _c(
-                    "a",
-                    {
-                      staticClass: "btn btn-sm btn-link text-danger",
-                      on: {
-                        click: function($event) {
-                          return _vm.deleteNote(aNote)
-                        }
-                      }
-                    },
-                    [_c("i", { staticClass: "fa fa-times" })]
-                  )
-                ]),
-                _vm._v(" "),
-                _c(
-                  "div",
-                  { staticClass: "col-12" },
-                  [
-                    _c(
-                      "router-link",
-                      {
-                        attrs: {
-                          to: { name: "editNote", params: { id: aNote.id } }
-                        }
-                      },
+                _vm.commenting[aNote.id]
+                  ? _c(
+                      "div",
                       [
-                        _vm._v(
-                          "\n              " +
-                            _vm._s(aNote.text) +
-                            "\n            "
-                        )
-                      ]
-                    )
-                  ],
-                  1
-                )
-              ]),
-              _vm._v(" "),
-              _vm.commenting[aNote.id]
-                ? _c(
-                    "div",
-                    [
-                      _c("list-comments", {
-                        attrs: { comments: aNote.comments }
-                      }),
-                      _vm._v(" "),
-                      _c("add-comment", {
-                        attrs: { "note-id": aNote.id },
-                        on: {
-                          saved: function($event) {
-                            return _vm.reloadComments($event, aNote)
+                        _c("add-comment", {
+                          attrs: { "note-id": aNote.id },
+                          on: {
+                            saved: function($event) {
+                              return _vm.reloadComments($event, aNote)
+                            }
                           }
-                        }
-                      })
-                    ],
-                    1
-                  )
-                : _vm._e()
-            ])
+                        }),
+                        _vm._v(" "),
+                        _c("list-comments", {
+                          attrs: { comments: aNote.comments }
+                        })
+                      ],
+                      1
+                    )
+                  : _vm._e()
+              ]
+            )
           }),
           0
         )
@@ -1435,18 +1309,7 @@ var render = function() {
     1
   )
 }
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "row mb-3 mini-navi" }, [
-      _c("div", { staticClass: "col-6" }),
-      _vm._v(" "),
-      _c("div", { staticClass: "col-6 text-right" })
-    ])
-  }
-]
+var staticRenderFns = []
 render._withStripped = true
 
 

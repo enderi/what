@@ -1,6 +1,6 @@
 <template>
   <b-container>
-    <Topbar />
+    <Topbar class="mb-3" />
     <div class="container-fluid">
       <router-view></router-view>
     </div>

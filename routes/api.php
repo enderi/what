@@ -35,4 +35,5 @@ Route::group(['middleware' => ['auth:api']], function () {
     Route::put('notes/{id}', [Api\ManagedNoteController::class, 'update']);
     Route::post('notes/{id}/comment', [Api\ManagedNoteController::class, 'addComment']);
     Route::get('categories', [Api\CategoryController::class, 'index']);
+    Route::put('categories/{id}', [Api\CategoryController::class, 'update']);
 });

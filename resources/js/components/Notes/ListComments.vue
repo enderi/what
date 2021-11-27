@@ -1,16 +1,7 @@
 <template>
-  <ul class="list-group list-group-flush">
-    <li v-for="comment in comments" class="list-group-item">
-      <div class="row">
-        <div class="col-8">
-          {{ comment.text }}
-        </div>
-        <div class="col-4">
-          <span class="text-right"
-            ><small>{{ comment.created_at | moment('YYYY-MM-DD') }}</small></span
-          >
-        </div>
-      </div>
+  <ul class="pb-2">
+    <li v-for="comment in reversed">
+      {{ comment.text }} <small class="text-muted">{{ comment.created_at | moment('YYYY-MM-DD') }}</small>
     </li>
   </ul>
 </template>
@@ -20,6 +11,11 @@ export default {
   props: {
     comments: Array,
     maxRows: Number,
+  },
+  computed: {
+    reversed() {
+      return this.comments.reverse()
+    }
   },
   data() {
     return {};

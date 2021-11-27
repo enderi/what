@@ -77,10 +77,7 @@ class ManagedNoteController extends Controller
             $note->category_id = $existingCategory->id;
         }
         $user->notes()->save($note);
-        return [
-            'notes' => $request->user()->notes()->orderBy('created_at', 'desc')->get(),
-            'categories' => $request->user()->categories
-        ];
+        return $note;
     }
 
     public function addComment($id, Request $request) {

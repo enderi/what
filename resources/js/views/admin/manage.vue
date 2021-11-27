@@ -1,59 +1,21 @@
 <template>
   <div>
-    <div class="row mb-3 mini-navi">
-      <div class="col-6">
-      </div>
-      <div class="col-6 text-right"></div>
-    </div>
     <log-fields @saved="noteAdded"></log-fields>
-    <div v-if="notes && notes.length > 0" class="mb-3">
-      <div class="list-group border border-success">
-        <div
-          v-for="item in notes"
-          href="#"
-          class="list-group-item list-group-item-action"
-          aria-current="true"
-        >
-          <div class="row">
-            <div class="col-8">
-              <div class="text-success">New item</div>
-              <span
-                ><small class="text-muted"
-                  >{{ item.created_at | moment("DD.MM.YYYY") }}
-                  <span v-if="item.category"
-                    >| {{ item.category.name }}</span
-                  ></small
-                >
-              </span>
-              <br />
-              <p class="mb1">
-                {{ item.text }}
-              </p>
-            </div>
-            <div class="col-4 text-right">
-              <!-- <a @click="open(item)" class="btn btn-sm btn-primary">Open</a> -->
-              <a
-                @click="keep(item)"
-                class="btn btn-sm btn-outline-primary text-end"
-                ><i class="fa fa-save"></i
-              ></a>
-              <a @click="forget(item)" class="btn btn-sm btn-outline-danger"
-                ><i class="fa fa-times"></i
-              ></a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
     <div class="card mt-1">
-      <div class="card-header">Notes</div>
+      <div class="card-header d-flex justify-content-between align-items-center">Notes
+        <!-- <b-dropdown id="dropdown-form" text="Filter" ref="dropdown" class="m-2">
+           <b-dropdown-form>
+              <b-form-checkbox variant="primary" v-model="categoryFilter">By Category</b-form-checkbox>
+           </b-dropdown-form>
+        </b-dropdown> -->
+      </div>
       <ul
         class="list-group list-group-flush"
         style="max-height: 65vh; overflow-y: auto"
       >
-        <li v-for="aNote in activeNotes" class="list-group-item">
+        <li v-for="aNote in filteredNotes" class="list-group-item pt-0 pb-0 pl-2 pr-2">
           <div class="row">
-            <div class="col-8">
+            <div class="col-7">
               <small class="text-muted"
                   >{{ aNote.created_at | moment("DD.MM.YYYY") }}
                   <span v-if="aNote.category"
@@ -61,30 +23,31 @@
                   ></small
                 >
             </div>
-            <div class="col-4 text-right">
-              <a
-                @click="commentNote(aNote)"
-                class="btn btn-sm btn-link"
-                ><i class="fa fa-comment"></i>
-              </a>
+            <div class="col-5 text-right">
               <a
                 @click="deleteNote(aNote)"
-                class="btn btn-sm btn-link text-danger"
+                class="btn btn-link p-1 text-danger"
                 ><i class="fa fa-times"></i>
               </a>
+              <a
+                @click="commentNote(aNote)"
+                class="btn btn-link p-1"
+                ><i class="fa fa-comment"></i>
+              </a>
+              <router-link :to="{ name: 'editNote', params: { id: aNote.id } }" class="btn btn-link p-1">
+                <i class="fa fa-edit"></i>
+              </router-link>
             </div>
             <div class="col-12">
-              <router-link :to="{ name: 'editNote', params: { id: aNote.id } }">
-                {{ aNote.text }}
-              </router-link>
+                <p>{{ aNote.text }}</p>
             </div>
           </div>
           <div v-if="commenting[aNote.id]">
-            <list-comments :comments="aNote.comments"></list-comments>
             <add-comment
               :note-id="aNote.id"
               @saved="reloadComments($event, aNote)"
             ></add-comment>
+            <list-comments :comments="aNote.comments"></list-comments>
           </div>
         </li>
       </ul>
@@ -111,20 +74,23 @@ export default {
   data() {
     return {
       notes: [],
-      activeNotes: [],
       categories: [],
       commenting: {},
+      categoryFilter: false
     };
+  },
+  computed: {
+    filteredNotes() {
+      return this.notes
+    }
   },
   methods: {
     loadData() {
       axios.get("info").then((resp) => this.parseStuff(resp.data));
     },
     parseStuff(data) {
-      this.notes = data.notes.filter((mn) => mn.type === "FLOW");
-      this.activeNotes = data.notes.filter((mn) => mn.type !== "FLOW");
-      var categories = data.categories;
-      console.log(this.notes, this.activeNotes);
+      this.notes = data.notes
+      this.categories = data.categories;
     },
     open(note) {
       //axios.get("note/" + note.id);
@@ -148,19 +114,12 @@ export default {
       }
     },
     noteAdded(resp) {
-      console.log(resp)
+      this.commentNote(resp)
       this.loadData()
     },
     reloadComments(comment, note) {
       note.comments.push(comment)
-      
-      return;
-      axios.get("notes/" + note.id + "/comments").then((resp) => {
-        console.log(resp);
-        this.$set(note, "comments", resp.data);
-      });
     },
   },
-  computed: {},
 };
 </script>

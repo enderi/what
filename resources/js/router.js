@@ -57,6 +57,15 @@ let router = new Router({
             }
         },
         {
+            path: "/categories",
+            name: "categories",
+            component: () => import("./views/admin/categories.vue"),
+            meta: {
+                requiresAuth: true,
+                layout: AdminLayout
+            }
+        },
+        {
             path: "/notes/:id",
             name: "editNote",
             component: () => import("./views/admin/editNote.vue"),

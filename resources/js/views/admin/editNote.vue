@@ -1,17 +1,5 @@
 <template>
   <div>
-    <div class="row mb-3 mini-navi">
-      <div class="col-6">
-        <router-link :to="{name: 'manage'}" class="btn btn-link">
-          <i class="fa fa-arrow-left"></i> Notes
-        </router-link>
-      </div>
-      <div class="col-6 text-right">
-        <!-- <button class="btn text-right" :disabled="editing" :class="{'btn-outline-primary': !editing, 'btn-outline-secondary': editing}" @click="enterEdit">
-          <i class="fa fa-pencil"></i>Edit
-        </button> -->
-      </div>
-    </div>
     <b-card>
       <b-overlay :show="loading" rounded="sm">
         <div class="row">
@@ -31,7 +19,7 @@
                 </div>
               </div>
               <div class="row mt-3">
-                <div class="col-xs-12 col-sm-6">
+                <div class="col-xs-12 col-sm-6 mb-2">
                   <select
                     v-model="note.category_id"
                     class="custom-select"

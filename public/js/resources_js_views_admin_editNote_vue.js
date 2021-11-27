@@ -23,6 +23,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: {
     noteId: Number
@@ -32,6 +34,7 @@ __webpack_require__.r(__webpack_exports__);
       comment: ""
     };
   },
+  mounted: function mounted() {},
   methods: {
     addComment: function addComment() {
       var self = this;
@@ -156,18 +159,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _borders_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./borders.vue */ "./resources/js/views/admin/borders.vue");
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 //
 //
 //
@@ -547,8 +538,14 @@ var render = function() {
             expression: "comment"
           }
         ],
+        ref: "comment_" + _vm.noteId,
         staticClass: "form-control",
-        attrs: { type: "text", autofocus: "", placeholder: "new comment" },
+        attrs: {
+          type: "text",
+          autofocus: "",
+          id: "comment_" + _vm.noteId,
+          placeholder: "new comment"
+        },
         domProps: { value: _vm.comment },
         on: {
           input: function($event) {
@@ -726,29 +723,6 @@ var render = function() {
   return _c(
     "div",
     [
-      _c("div", { staticClass: "row mb-3 mini-navi" }, [
-        _c(
-          "div",
-          { staticClass: "col-6" },
-          [
-            _c(
-              "router-link",
-              {
-                staticClass: "btn btn-link",
-                attrs: { to: { name: "manage" } }
-              },
-              [
-                _c("i", { staticClass: "fa fa-arrow-left" }),
-                _vm._v(" Notes\n      ")
-              ]
-            )
-          ],
-          1
-        ),
-        _vm._v(" "),
-        _c("div", { staticClass: "col-6 text-right" })
-      ]),
-      _vm._v(" "),
       _c(
         "b-card",
         [
@@ -794,7 +768,7 @@ var render = function() {
                     ]),
                     _vm._v(" "),
                     _c("div", { staticClass: "row mt-3" }, [
-                      _c("div", { staticClass: "col-xs-12 col-sm-6" }, [
+                      _c("div", { staticClass: "col-xs-12 col-sm-6 mb-2" }, [
                         _c(
                           "select",
                           {
