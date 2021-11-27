@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Comment;
 use App\Models\ManagedNote;
 use Illuminate\Http\Request;
+use Ramsey\Uuid\Uuid;
 
 class ManagedNoteController extends Controller
 {
@@ -66,12 +67,14 @@ class ManagedNoteController extends Controller
         $note->status = 'INITIALIZED';
         $note->type = 'ALIVE';
         $note->props = '{}';
+        $note->uuid = Uuid::uuid4();
         if ($category != null && strlen($category) > 0) {
             $existingCategory = $user->categories()->firstWhere('tag', strtolower($category));
             if ($existingCategory == null) {
-                $user->categories()->create([
+                $existingCategory = $user->categories()->create([
                     'name' => ucwords(strtolower($category)),
-                    'tag' => strtolower($category)
+                    'tag' => strtolower($category),
+                    'props' => ['todo' => false]
                 ]);
             }
             $note->category_id = $existingCategory->id;
@@ -88,6 +91,7 @@ class ManagedNoteController extends Controller
         $comment = new Comment();
         $comment->text = $request->get('comment');
         $comment->user_id = $request->user()->id;
+        $comment->comment_chain_uuid = $managedNote->uuid;
         $managedNote->comments()->save($comment);
         return $comment;
     }

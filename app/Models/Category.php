@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class Category extends Model
 {
     use HasFactory;
-    protected $fillable = ['name', 'tag', 'user_id'];
+    protected $fillable = ['name', 'tag', 'user_id', 'props'];
 
     protected $casts = ['props' => AsArrayObject::class];
 
