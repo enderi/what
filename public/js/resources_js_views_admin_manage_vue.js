@@ -219,7 +219,14 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
-
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_components$name$moun = {
@@ -236,7 +243,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       text: "",
       category: "",
       notes: [],
-      categories: []
+      categories: [],
+      newCategoryPlaceholder: null
     };
   }
 }, _defineProperty(_components$name$moun, "mounted", function mounted() {
@@ -262,12 +270,15 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         //title: 'BootstrapVue Toast',
         autoHideDelay: 5000,
         solid: true,
-        variant: 'success',
-        toaster: 'b-toaster-bottom-center'
+        variant: "success",
+        toaster: "b-toaster-bottom-center"
       });
 
-      _this2.$emit('saved', resp.data);
+      _this2.$emit("saved", resp.data);
     });
+  },
+  selectCategory: function selectCategory(cat) {
+    console.log(cat);
   }
 }), _defineProperty(_components$name$moun, "watch", {
   text: function text(newText, oldText) {
@@ -284,6 +295,23 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         break;
       }
     } while (m);
+
+    if (this.category) {
+      var exists = _.find(this.categories, {
+        tag: this.category
+      });
+
+      if (exists) {
+        this.newCategoryPlaceholder = null;
+        return;
+      } else {
+        this.newCategoryPlaceholder = {
+          tag: this.category
+        };
+      }
+    } else {
+      this.newCategoryPlaceholder = null;
+    }
   }
 }), _components$name$moun);
 
@@ -1079,36 +1107,33 @@ var render = function() {
     },
     [
       _c("div", { staticClass: "row" }, [
-        _c("div", { staticClass: "col-xs-12 col-sm-6" }, [
-          _c("input", {
-            directives: [
-              {
-                name: "model",
-                rawName: "v-model",
+        _c(
+          "div",
+          { staticClass: "col-xs-12 col-sm-8" },
+          [
+            _c("b-form-textarea", {
+              staticClass: "mb-2",
+              attrs: {
+                id: "textarea",
+                placeholder: "...add a note with #category",
+                rows: "2",
+                "max-rows": "3",
+                autocomplete: "off"
+              },
+              model: {
                 value: _vm.text,
+                callback: function($$v) {
+                  _vm.text = $$v
+                },
                 expression: "text"
               }
-            ],
-            staticClass: "form-control mb-2",
-            attrs: {
-              type: "text",
-              id: "what",
-              autofocus: "",
-              autocomplete: "off",
-              placeholder: "What..?"
-            },
-            domProps: { value: _vm.text },
-            on: {
-              input: function($event) {
-                if ($event.target.composing) {
-                  return
-                }
-                _vm.text = $event.target.value
-              }
-            }
-          })
-        ]),
-        _vm._v(" "),
+            })
+          ],
+          1
+        )
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "row" }, [
         _c("div", { staticClass: "col-xs-8 col-sm-4" }, [
           _vm.categories
             ? _c(
@@ -1144,6 +1169,20 @@ var render = function() {
                   _c("option", { attrs: { value: "" } }, [
                     _vm._v("- No Category -")
                   ]),
+                  _vm._v(" "),
+                  _vm.newCategoryPlaceholder
+                    ? _c(
+                        "option",
+                        { domProps: { value: _vm.newCategoryPlaceholder.tag } },
+                        [
+                          _vm._v(
+                            "\n          New: " +
+                              _vm._s(_vm.newCategoryPlaceholder.tag) +
+                              "\n        "
+                          )
+                        ]
+                      )
+                    : _vm._e(),
                   _vm._v(" "),
                   _vm._l(_vm.categories, function(category) {
                     return _c("option", { domProps: { value: category.tag } }, [

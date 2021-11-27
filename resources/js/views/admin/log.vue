@@ -1,17 +1,19 @@
 <template>
   <form @submit.prevent="submit">
     <div class="row">
-      <div class="col-xs-12 col-sm-6">
-        <input
-          type="text"
-          id="what"
-          class="form-control mb-2"
-          autofocus
-          autocomplete="off"
+      <div class="col-xs-12 col-sm-8">
+        <b-form-textarea
+          id="textarea"
           v-model="text"
-          placeholder="What..?"
-        />
+          placeholder="...add a note with #category"
+          rows="2"
+          max-rows="3"
+          class="mb-2"
+          autocomplete="off"
+        ></b-form-textarea>
       </div>
+    </div>
+    <div class="row">
       <div class="col-xs-8 col-sm-4">
         <select
           v-if="categories"
@@ -20,6 +22,12 @@
           aria-label="Select category"
         >
           <option value="">- No Category -</option>
+          <option
+            v-if="newCategoryPlaceholder"
+            :value="newCategoryPlaceholder.tag"
+          >
+            New: {{newCategoryPlaceholder.tag}}
+          </option>
           <option v-for="category in categories" :value="category.tag">
             {{ category.name }}
           </option>
@@ -38,7 +46,6 @@
 <script>
 import ListNotes from "../../components/Notes/ListNotes";
 import SelectCategory from "../../components/Notes/SelectCategory.vue";
-import { mapGetters } from "vuex";
 
 export default {
   components: {
@@ -55,6 +62,7 @@ export default {
       category: "",
       notes: [],
       categories: [],
+      newCategoryPlaceholder: null,
     };
   },
   mounted() {
@@ -75,11 +83,14 @@ export default {
             //title: 'BootstrapVue Toast',
             autoHideDelay: 5000,
             solid: true,
-            variant: 'success',
-            toaster: 'b-toaster-bottom-center'
+            variant: "success",
+            toaster: "b-toaster-bottom-center",
           });
-          this.$emit('saved', resp.data)
+          this.$emit("saved", resp.data);
         });
+    },
+    selectCategory(cat) {
+      console.log(cat);
     },
   },
   watch: {
@@ -95,6 +106,19 @@ export default {
           break;
         }
       } while (m);
+      if (this.category) {
+        var exists = _.find(this.categories, { tag: this.category });
+        if (exists) {
+          this.newCategoryPlaceholder = null;
+          return;
+        } else {
+          this.newCategoryPlaceholder = {
+            tag: this.category,
+          };
+        }
+      } else {
+        this.newCategoryPlaceholder = null;
+      }
     },
   },
 };
