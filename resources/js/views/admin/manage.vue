@@ -50,7 +50,7 @@
               :note-id="aNote.id"
               @saved="reloadComments($event, aNote)"
             ></add-comment>
-            <list-comments :comments="aNote.comments"></list-comments>
+            <list-comments @commentchanged="reloadAllComments(aNote)" :comments="aNote.comments"></list-comments>
           </div>
         </li>
       </ul>
@@ -70,7 +70,6 @@ export default {
     LogFields,
   },
   mounted() {
-    console.log("monttu", this.$route.params);
     this.loadData();
   },
   data() {
@@ -129,6 +128,13 @@ export default {
     reloadComments(comment, note) {
       note.comments.push(comment)
     },
+    reloadAllComments(note) {
+      axios.get('notes/' + note.id + '/comments')
+      .then(resp => {
+        console.log('notes', resp.data)
+        note.comments = resp.data
+      })
+    }
   },
 };
 </script>

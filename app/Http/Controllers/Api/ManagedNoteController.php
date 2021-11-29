@@ -111,4 +111,13 @@ class ManagedNoteController extends Controller
         $managedNote->resolved = true;
         $managedNote->save();
     }
+
+    public function resolveComment($id, Request $request) {
+        $comment = Comment::find($id);
+        if($comment->user_id != $request->user()->id) {
+            abort(403);
+        }
+        $comment->resolved = true;
+        $comment->save();
+    }
 }
