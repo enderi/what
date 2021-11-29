@@ -1093,7 +1093,7 @@ var render = function() {
               _c(
                 "a",
                 {
-                  staticClass: "btn btn-link text-danger",
+                  staticClass: "btn btn-link text-success",
                   attrs: { href: "" },
                   on: {
                     click: function($event) {
@@ -1101,7 +1101,7 @@ var render = function() {
                     }
                   }
                 },
-                [_c("i", { staticClass: "fa fa-times" })]
+                [_c("i", { staticClass: "fa fa-check" })]
               )
             ])
           : _vm._e()

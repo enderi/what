@@ -2,7 +2,7 @@
   <ul class="pb-2">
     <li v-for="comment in reversed">
       <span :class="{'strikethrough': comment.resolved}" >{{ comment.text }}</span> <small class="text-muted">{{ comment.created_at | moment('YYYY-MM-DD') }}</small>
-      <small v-if="!comment.resolved"><a class="btn btn-link text-danger" href="" @click="resolveComment(comment, $event)"><i class="fa fa-times"></i></a></small>
+      <small v-if="!comment.resolved"><a class="btn btn-link text-success" href="" @click="resolveComment(comment, $event)"><i class="fa fa-check"></i></a></small>
     </li>
   </ul>
 </template>
