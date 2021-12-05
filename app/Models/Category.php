@@ -11,7 +11,7 @@ class Category extends Model
     use HasFactory;
     protected $fillable = ['name', 'tag', 'user_id', 'props'];
 
-    protected $casts = ['props' => AsArrayObject::class];
+    protected $casts = ['props' => 'array'];
 
     public function notes() {
         return $this->hasMany(ManagedNote::class);

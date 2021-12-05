@@ -276,6 +276,31 @@ var render = function() {
                       ),
                       _vm._v(" "),
                       _c(
+                        "b-form-group",
+                        { attrs: { id: "input-group-4" } },
+                        [
+                          _c(
+                            "b-form-checkbox",
+                            {
+                              model: {
+                                value: category.props.addToLatest,
+                                callback: function($$v) {
+                                  _vm.$set(category.props, "addToLatest", $$v)
+                                },
+                                expression: "category.props.addToLatest"
+                              }
+                            },
+                            [
+                              _vm._v(
+                                "Add new items as comments under latest note"
+                              )
+                            ]
+                          )
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
                         "div",
                         { staticClass: "text-right" },
                         [

@@ -47,9 +47,9 @@
                     required
                   ></b-form-input>
                 </b-form-group>
-                <!--<b-form-group id="input-group-4">
-                  <b-form-checkbox v-model="category.props.todo">Todo</b-form-checkbox>
-                </b-form-group>-->
+                <b-form-group id="input-group-4">
+                  <b-form-checkbox v-model="category.props.addToLatest">Add new items as comments under latest note</b-form-checkbox>
+                </b-form-group>
                 <div class="text-right">
                   <b-button type="submit" variant="primary">Save</b-button>
                 </div>

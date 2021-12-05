@@ -13,6 +13,7 @@ class NoteController extends Controller
                 ->notes()
                 ->with(['category', 'comments'])
                 ->where('resolved', false)
+                ->where('parent_uuid', null)
                 ->orderBy('created_at', 'desc')
                 ->orderBy('created_at', 'desc')
                 ->get(),

@@ -15,6 +15,6 @@ class ManagedNote extends Model
     }
     
     public function comments() {
-        return $this->hasMany('App\Models\Comment');
+        return $this->hasMany('App\Models\ManagedNote', 'parent_uuid', 'uuid');
     }
 }

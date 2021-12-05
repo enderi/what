@@ -73,6 +73,18 @@ class ManagedNoteController extends Controller
                     'tag' => strtolower($category),
                     'props' => ['todo' => false]
                 ]);
+            } else {
+                $props = $existingCategory->props;
+                
+                if(key_exists('addToLatest', $props) && $props['addToLatest'] == true) {
+                    $lastInCategory = ManagedNote::where('user_id', $user->id)
+                    ->where('category_id', $existingCategory->id)
+                    ->orderByDesc('created_at')
+                    ->first();
+                    if($lastInCategory != null) {
+                        $note->parent_uuid = $lastInCategory->uuid;
+                    }
+                }
             }
             $note->category_id = $existingCategory->id;
         }
@@ -85,11 +97,13 @@ class ManagedNoteController extends Controller
         if ($managedNote->user_id != $request->user()->id) {
             abort(403);
         }
-        $comment = new Comment();
+        $comment = new ManagedNote();
         $comment->text = $request->get('comment');
         $comment->user_id = $request->user()->id;
-        $comment->comment_chain_uuid = $managedNote->uuid;
-        $managedNote->comments()->save($comment);
+        $comment->parent_uuid = $managedNote->uuid;
+        $comment->props = array();
+        $comment->uuid = Uuid::uuid4();
+        $comment->save();
         return $comment;
     }
 
@@ -113,7 +127,7 @@ class ManagedNoteController extends Controller
     }
 
     public function resolveComment($id, Request $request) {
-        $comment = Comment::find($id);
+        $comment = ManagedNote::find($id);
         if($comment->user_id != $request->user()->id) {
             abort(403);
         }
