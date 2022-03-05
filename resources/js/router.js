@@ -57,15 +57,6 @@ let router = new Router({
             }
         },
         {
-            path: "/notes/by-category/:tag",
-            name: "show-by-category",
-            component: () => import("./views/admin/manage.vue"),
-            meta: {
-                requiresAuth: true,
-                layout: AdminLayout
-            }
-        },
-        {
             path: "/categories",
             name: "categories",
             component: () => import("./views/admin/categories.vue"),

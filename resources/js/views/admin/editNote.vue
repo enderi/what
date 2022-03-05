@@ -44,6 +44,7 @@
             </form>
           </div>
           <div class="col-xs-12 col-sm-6">
+            
             <p>Have a chat with yourself:</p>
             <add-comment :note-id="note.id" @saved="commentAdded"></add-comment>
             <ul class="mt-2">

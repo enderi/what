@@ -194,7 +194,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _components_Notes_ListNotes__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../components/Notes/ListNotes */ "./resources/js/components/Notes/ListNotes.vue");
 /* harmony import */ var _components_Notes_SelectCategory_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../components/Notes/SelectCategory.vue */ "./resources/js/components/Notes/SelectCategory.vue");
-var _components$name$moun;
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -243,95 +246,103 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
 
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_components$name$moun = {
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
     ListNotes: _components_Notes_ListNotes__WEBPACK_IMPORTED_MODULE_0__.default,
     SelectCategory: _components_Notes_SelectCategory_vue__WEBPACK_IMPORTED_MODULE_1__.default
   },
   name: "Dashboard",
-  mounted: function mounted() {
-    this.$store.dispatch("fetchInfo");
-  },
   data: function data() {
     return {
       text: "",
-      category: "",
       notes: [],
       categories: [],
-      newCategoryPlaceholder: null
+      newCategoryPlaceholder: null,
+      category: ''
     };
-  }
-}, _defineProperty(_components$name$moun, "mounted", function mounted() {
-  var _this = this;
+  },
+  mounted: function mounted() {
+    var _this = this;
 
-  axios.get("info").then(function (resp) {
-    _this.notes = resp.data.notes;
-    _this.categories = _.chain(resp.data.categories).sortBy('notes_count').filter(function (f) {
-      return !f.props.hideFromSelect;
-    }).reverse().valueOf();
-  });
-}), _defineProperty(_components$name$moun, "methods", {
-  submit: function submit() {
-    var _this2 = this;
-
-    var self = this;
-    axios.post("/notes", {
-      text: this.text,
-      category: this.category
-    }).then(function (resp) {
-      self.text = "";
-      self.$store.dispatch("fetchInfo");
-
-      _this2.$bvToast.toast("Note saved", {
-        //title: 'BootstrapVue Toast',
-        autoHideDelay: 5000,
-        solid: true,
-        variant: "success",
-        toaster: "b-toaster-bottom-center"
-      });
-
-      _this2.$emit("saved", resp.data);
+    this.$store.dispatch("fetchInfo");
+    axios.get("info").then(function (resp) {
+      _this.notes = resp.data.notes;
+      _this.categories = _.chain(resp.data.categories).sortBy('notes_count').filter(function (f) {
+        return !f.props.hideFromSelect;
+      }).reverse().valueOf();
     });
   },
-  selectCategory: function selectCategory(cat) {
-    console.log(cat);
-  }
-}), _defineProperty(_components$name$moun, "watch", {
-  text: function text(newText, oldText) {
-    var re = /(^|\s)(#[a-zöäå\d-]+)/gi;
-    var s = newText;
-    var m;
-    var category = null;
+  methods: {
+    submit: function submit() {
+      var _this2 = this;
 
-    do {
-      m = re.exec(s);
+      var self = this;
+      axios.post("/notes", {
+        text: this.text,
+        category: this.category
+      }).then(function (resp) {
+        self.text = "";
+        self.$store.dispatch("fetchInfo");
 
-      if (m) {
-        this.category = m[2].split("#")[1];
-        break;
-      }
-    } while (m);
+        _this2.$bvToast.toast("Note saved", {
+          autoHideDelay: 5000,
+          solid: true,
+          variant: "success",
+          toaster: "b-toaster-bottom-center"
+        });
 
-    if (this.category) {
-      var exists = _.find(this.categories, {
-        tag: this.category
+        _this2.$emit("saved", resp.data);
       });
-
-      if (exists) {
-        this.newCategoryPlaceholder = null;
-        return;
-      } else {
-        this.newCategoryPlaceholder = {
-          tag: this.category
-        };
-      }
-    } else {
-      this.newCategoryPlaceholder = null;
+    },
+    categorySelected: function categorySelected() {
+      this.$store.dispatch("selectCategory", this.category);
     }
-  }
-}), _components$name$moun);
+  },
+  watch: {
+    text: function text(newText) {
+      var re = /(^|\s)(#[a-zöäå\d-]+)/gi;
+      var s = newText;
+      var m;
+
+      do {
+        m = re.exec(s);
+
+        if (m) {
+          this.category = m[2].split("#")[1];
+          break;
+        }
+      } while (m);
+
+      if (this.category) {
+        var exists = _.find(this.categories, {
+          tag: this.category
+        });
+
+        if (exists) {
+          this.newCategoryPlaceholder = null;
+          return;
+        } else {
+          this.newCategoryPlaceholder = {
+            tag: this.category
+          };
+        }
+      } else {
+        this.newCategoryPlaceholder = null;
+      }
+    },
+    selectedCategory: function selectedCategory(newT, oldT) {
+      if (oldT !== newT) {
+        this.category = newT;
+      }
+    }
+  },
+  computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_2__.mapGetters)(["selectedCategory"]))
+});
 
 /***/ }),
 
@@ -350,6 +361,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_Notes_ListComments_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../components/Notes/ListComments.vue */ "./resources/js/components/Notes/ListComments.vue");
 /* harmony import */ var _log_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./log.vue */ "./resources/js/views/admin/log.vue");
 /* harmony import */ var _services_NoteService__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../services/NoteService */ "./resources/js/services/NoteService.js");
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 //
 //
 //
@@ -425,16 +443,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
+
 
 
 
@@ -458,13 +467,13 @@ __webpack_require__.r(__webpack_exports__);
       tagFilter: null
     };
   },
-  computed: {
+  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_4__.mapGetters)(["selectedCategory"])), {}, {
     filteredNotes: function filteredNotes() {
       var _this = this;
 
-      this.tagFilter = this.$route.params.tag;
+      this.tagFilter = this.selectedCategory;
 
-      if (this.$route.params && this.$route.params.tag) {
+      if (this.tagFilter) {
         return _.filter(this.notes, function (item) {
           return item.category && item.category.tag === _this.tagFilter;
         });
@@ -472,7 +481,7 @@ __webpack_require__.r(__webpack_exports__);
 
       return this.notes;
     }
-  },
+  }),
   methods: {
     loadData: function loadData() {
       var _this2 = this;
@@ -484,7 +493,6 @@ __webpack_require__.r(__webpack_exports__);
     parseStuff: function parseStuff(data) {
       this.notes = data.notes;
       this.categories = data.categories;
-      console.log(data, _services_NoteService__WEBPACK_IMPORTED_MODULE_3__.default);
       (0,_services_NoteService__WEBPACK_IMPORTED_MODULE_3__.default)(data);
     },
     open: function open(note) {//axios.get("note/" + note.id);
@@ -516,9 +524,14 @@ __webpack_require__.r(__webpack_exports__);
     },
     reloadAllComments: function reloadAllComments(note) {
       axios.get("notes/" + note.id + "/comments").then(function (resp) {
-        console.log("notes", resp.data);
         note.comments = resp.data;
       });
+    },
+    selectCategory: function selectCategory(cat) {
+      this.$store.dispatch("selectCategory", cat.tag);
+    },
+    deselectCategory: function deselectCategory() {
+      this.$store.dispatch("selectCategory", '');
     }
   }
 });
@@ -1269,6 +1282,7 @@ var render = function() {
       }
     },
     [
+      _vm._v("\n  selectedCategory: " + _vm._s(_vm.selectedCategory) + "\n  "),
       _c("div", { staticClass: "row" }, [
         _c(
           "div",
@@ -1313,19 +1327,22 @@ var render = function() {
                   staticClass: "custom-select mb-2",
                   attrs: { "aria-label": "Select category" },
                   on: {
-                    change: function($event) {
-                      var $$selectedVal = Array.prototype.filter
-                        .call($event.target.options, function(o) {
-                          return o.selected
-                        })
-                        .map(function(o) {
-                          var val = "_value" in o ? o._value : o.value
-                          return val
-                        })
-                      _vm.category = $event.target.multiple
-                        ? $$selectedVal
-                        : $$selectedVal[0]
-                    }
+                    change: [
+                      function($event) {
+                        var $$selectedVal = Array.prototype.filter
+                          .call($event.target.options, function(o) {
+                            return o.selected
+                          })
+                          .map(function(o) {
+                            var val = "_value" in o ? o._value : o.value
+                            return val
+                          })
+                        _vm.category = $event.target.multiple
+                          ? $$selectedVal
+                          : $$selectedVal[0]
+                      },
+                      _vm.categorySelected
+                    ]
                   }
                 },
                 [
@@ -1423,16 +1440,20 @@ var render = function() {
           [
             _vm._v("\n      Notes\n      "),
             _vm.tagFilter
-              ? _c(
-                  "div",
-                  {},
-                  [
-                    _c("router-link", { attrs: { to: { name: "notes" } } }, [
-                      _vm._v("Show all")
-                    ])
-                  ],
-                  1
-                )
+              ? _c("div", {}, [
+                  _c(
+                    "span",
+                    {
+                      staticClass: "btn btn-link",
+                      on: {
+                        click: function($event) {
+                          return _vm.deselectCategory()
+                        }
+                      }
+                    },
+                    [_vm._v("Show all")]
+                  )
+                ])
               : _vm._e()
           ]
         ),
@@ -1460,30 +1481,37 @@ var render = function() {
                         ) + "\n              "
                       ),
                       aNote.category
-                        ? _c(
-                            "span",
-                            [
-                              _vm._v("|\n                "),
-                              _c(
-                                "router-link",
-                                {
-                                  attrs: {
-                                    to: {
-                                      name: "show-by-category",
-                                      params: { tag: aNote.category.tag }
+                        ? _c("span", [
+                            _vm._v("| "),
+                            aNote.category.props.hideFromSelect
+                              ? _c("span", [
+                                  _vm._v(_vm._s(aNote.category.name))
+                                ])
+                              : _vm._e(),
+                            _vm._v(" "),
+                            !aNote.category.props.hideFromSelect
+                              ? _c(
+                                  "span",
+                                  {
+                                    staticClass: "btn btn-link",
+                                    on: {
+                                      click: function($event) {
+                                        return _vm.selectCategory(
+                                          aNote.category
+                                        )
+                                      }
                                     }
-                                  }
-                                },
-                                [
-                                  _vm._v(
-                                    "\n                  " +
-                                      _vm._s(aNote.category.name)
-                                  )
-                                ]
-                              )
-                            ],
-                            1
-                          )
+                                  },
+                                  [
+                                    _vm._v(
+                                      "\n                  " +
+                                        _vm._s(aNote.category.name) +
+                                        "\n                "
+                                    )
+                                  ]
+                                )
+                              : _vm._e()
+                          ])
                         : _vm._e()
                     ])
                   ]),
@@ -1561,7 +1589,13 @@ var render = function() {
                           }
                         }
                       },
-                      [_vm._v(_vm._s(aNote.text))]
+                      [
+                        _vm._v(
+                          "\n              " +
+                            _vm._s(aNote.text) +
+                            "\n            "
+                        )
+                      ]
                     )
                   ])
                 ]),

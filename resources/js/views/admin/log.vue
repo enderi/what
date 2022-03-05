@@ -1,5 +1,6 @@
 <template>
   <form @submit.prevent="submit">
+    selectedCategory: {{selectedCategory}}
     <div class="row">
       <div class="col-xs-12 col-sm-8">
         <b-form-textarea
@@ -20,6 +21,7 @@
           v-model="category"
           class="custom-select mb-2"
           aria-label="Select category"
+          @change="categorySelected"
         >
           <option value="">- No Category -</option>
           <option
@@ -46,6 +48,7 @@
 <script>
 import ListNotes from "../../components/Notes/ListNotes";
 import SelectCategory from "../../components/Notes/SelectCategory.vue";
+import { mapGetters } from "vuex";
 
 export default {
   components: {
@@ -53,19 +56,17 @@ export default {
     SelectCategory,
   },
   name: "Dashboard",
-  mounted() {
-    this.$store.dispatch("fetchInfo");
-  },
   data() {
     return {
       text: "",
-      category: "",
       notes: [],
       categories: [],
       newCategoryPlaceholder: null,
+      category: ''
     };
   },
-  mounted() {
+  mounted() { 
+    this.$store.dispatch("fetchInfo");
     axios.get("info").then((resp) => {
       this.notes = resp.data.notes;
       this.categories = _.chain(resp.data.categories)
@@ -84,7 +85,6 @@ export default {
           self.text = "";
           self.$store.dispatch("fetchInfo");
           this.$bvToast.toast(`Note saved`, {
-            //title: 'BootstrapVue Toast',
             autoHideDelay: 5000,
             solid: true,
             variant: "success",
@@ -93,16 +93,15 @@ export default {
           this.$emit("saved", resp.data);
         });
     },
-    selectCategory(cat) {
-      console.log(cat);
-    },
+    categorySelected() {
+      this.$store.dispatch("selectCategory", this.category);
+    }
   },
   watch: {
-    text(newText, oldText) {
+    text(newText) {
       var re = /(^|\s)(#[a-zöäå\d-]+)/gi;
       var s = newText;
       var m;
-      var category = null;
       do {
         m = re.exec(s);
         if (m) {
@@ -124,6 +123,14 @@ export default {
         this.newCategoryPlaceholder = null;
       }
     },
+    selectedCategory(newT, oldT) {
+      if(oldT !== newT) {
+        this.category = newT
+      }
+    }
+  },
+  computed: {
+    ...mapGetters(["selectedCategory"]),
   },
 };
 </script>

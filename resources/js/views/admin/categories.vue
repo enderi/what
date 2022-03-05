@@ -14,28 +14,10 @@
                 >
             </div>
             <div class="col-5 text-right">
-              <!-- <a
-                @click="deleteNote(aNote)"
-                class="btn btn-link p-1 text-danger"
-                ><i class="fa fa-times"></i>
-              </a> -->
             </div>
             <div class="col-8"></div>
 
             <div class="col-4 text-right">
-              <!--<a
-                @click="commentNote(category)"
-                class="btn btn-sm btn-link"
-                ><i class="fa fa-comment"></i>
-              </a>
-              <router-link :to="{ name: 'editNote', params: { id: category.id } }">
-                <i class="fa fa-edit"></i>
-              </router-link>
-              <a
-                @click="deleteNote(category)"
-                class="btn btn-sm btn-link text-danger"
-                ><i class="fa fa-times"></i>
-              </a>-->
             </div>
             <div class="col-12">
               <b-form @submit="save(category.item, $event)">
@@ -81,7 +63,6 @@ export default {
   },
   methods: {
     changed(category) {
-      console.log(category, JSON.stringify(category.item), category.orig)
       return JSON.stringify(category.item) !== category.orig
     },
     loadData() {
@@ -97,7 +78,6 @@ export default {
       this.categories = data;
     },
     save(category, event){
-      console.log(category)
       event.preventDefault()
       axios.put('categories/' + category.id, category)
         .then((saved) => {

@@ -7,13 +7,8 @@
       >
         Notes
         <div class="" v-if="tagFilter">
-          <router-link :to="{ name: 'notes' }">Show all</router-link>
+          <span class="btn btn-link" @click="deselectCategory()">Show all</span>
         </div>
-        <!-- <b-dropdown id="dropdown-form" text="Filter" ref="dropdown" class="m-2">
-           <b-dropdown-form>
-              <b-form-checkbox variant="primary" v-model="categoryFilter">By Category</b-form-checkbox>
-           </b-dropdown-form>
-        </b-dropdown> -->
       </div>
       <ul
         class="list-group list-group-flush"
@@ -29,25 +24,20 @@
               <span class="text-muted"
                 >{{ aNote.created_at | moment("DD.MM.YYYY") }}
                 <span v-if="aNote.category"
-                  >|
-                  <router-link
-                    :to="{
-                      name: 'show-by-category',
-                      params: { tag: aNote.category.tag },
-                    }"
-                  >
-                    {{ aNote.category.name }}</router-link
-                  ></span
-                ></span
-              >
+                  >|&nbsp;<span v-if="aNote.category.props.hideFromSelect">{{ aNote.category.name }}</span>
+                  <span v-if="!aNote.category.props.hideFromSelect"
+                    @click="selectCategory(aNote.category)"
+                    class="btn btn-link">
+                    {{ aNote.category.name }}
+                  </span>
+                </span>
+              </span>
             </div>
             <div class="col-5 text-right">
-              <a @click="commentNote(aNote)" class="btn btn-link"
-                >
+              <a @click="commentNote(aNote)" class="btn btn-link">
                 <div class="badge badge-pill badge-outline-info text-secondary">
-                  <i class="fa fa-comment"></i> {{aNote.comments.length}}
-                </div>  
-
+                  <i class="fa fa-comment"></i> {{ aNote.comments.length }}
+                </div>
               </a>
               <a @click="deleteNote(aNote)" class="btn btn-link text-danger"
                 ><i class="fa fa-times"></i>
@@ -62,9 +52,9 @@
           </div>
           <div class="row">
             <div class="col-12">
-              <p @click="commentNote(aNote)" class="text-primary">{{
-                aNote.text
-              }}</p>
+              <p @click="commentNote(aNote)" class="text-primary">
+                {{ aNote.text }}
+              </p>
             </div>
           </div>
           <div v-if="commenting[aNote.id]">
@@ -87,8 +77,8 @@
 import AddComment from "../../components/Notes/AddComment.vue";
 import ListComments from "../../components/Notes/ListComments.vue";
 import LogFields from "./log.vue";
-
-import sortNotes from '../../services/NoteService'
+import sortNotes from "../../services/NoteService";
+import { mapGetters } from "vuex";
 
 export default {
   name: "Manage",
@@ -110,9 +100,10 @@ export default {
     };
   },
   computed: {
+    ...mapGetters(["selectedCategory"]),
     filteredNotes() {
-      this.tagFilter = this.$route.params.tag;
-      if (this.$route.params && this.$route.params.tag) {
+      this.tagFilter = this.selectedCategory;
+      if (this.tagFilter) {
         return _.filter(this.notes, (item) => {
           return item.category && item.category.tag === this.tagFilter;
         });
@@ -127,8 +118,7 @@ export default {
     parseStuff(data) {
       this.notes = data.notes;
       this.categories = data.categories;
-      console.log(data, sortNotes)
-      sortNotes(data)
+      sortNotes(data);
     },
     open(note) {
       //axios.get("note/" + note.id);
@@ -160,10 +150,15 @@ export default {
     },
     reloadAllComments(note) {
       axios.get("notes/" + note.id + "/comments").then((resp) => {
-        console.log("notes", resp.data);
         note.comments = resp.data;
       });
     },
+    selectCategory(cat) {
+      this.$store.dispatch("selectCategory", cat.tag);
+    },
+    deselectCategory() {
+      this.$store.dispatch("selectCategory", '')
+    }
   },
 };
 </script>

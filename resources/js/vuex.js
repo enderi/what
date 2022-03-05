@@ -8,7 +8,8 @@ Vue.use(Vuex);
 const state = {
     user: null,
     notes: null,
-    categories: null
+    categories: null,
+    selectedCategory: null
 };
 
 const store = new Vuex.Store({
@@ -22,6 +23,9 @@ const store = new Vuex.Store({
         },
         categories: (state) => {
             return state.categories
+        },
+        selectedCategory: (state) => {
+            return state.selectedCategory
         }
     },
     actions: {
@@ -38,8 +42,11 @@ const store = new Vuex.Store({
         fetchCategories: (context) => {
             axios.get('api/categories')
             .then(resp => {
-                console.log('response', resp);
+                //console.log('response', resp);
             })
+        },
+        selectCategory: (context, category) => {
+            context.commit('selectCategory', category)
         }
     },
     mutations: {
@@ -51,6 +58,9 @@ const store = new Vuex.Store({
         },
         categories: (state, categories) => {
             state.categories = categories
+        },
+        selectCategory: (state, category) => {
+            state.selectedCategory = category
         }
     },
     plugins: [createPersistedState({

@@ -60,24 +60,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "Categories",
   components: {},
@@ -92,7 +74,6 @@ __webpack_require__.r(__webpack_exports__);
   },
   methods: {
     changed: function changed(category) {
-      console.log(category, JSON.stringify(category.item), category.orig);
       return JSON.stringify(category.item) !== category.orig;
     },
     loadData: function loadData() {
@@ -112,7 +93,6 @@ __webpack_require__.r(__webpack_exports__);
       this.categories = data;
     },
     save: function save(category, event) {
-      console.log(category);
       event.preventDefault();
       axios.put('categories/' + category.id, category).then(function (saved) {
         category.item = saved;
