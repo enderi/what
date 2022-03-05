@@ -13,11 +13,11 @@ class NoteController extends Controller
                 ->notes()
                 ->with(['category', 'comments'])
                 ->where('resolved', false)
-                ->where('parent_uuid', null)
+                //->where('parent_uuid', null)
                 ->orderBy('created_at', 'desc')
                 ->orderBy('created_at', 'desc')
                 ->get(),
-            'categories' => $request->user()->categories
+            'categories' => $request->user()->categories()->withCount('notes')->get()
         ];
     }
 }

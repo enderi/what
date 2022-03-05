@@ -75,6 +75,9 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "Categories",
   components: {},
@@ -83,10 +86,15 @@ __webpack_require__.r(__webpack_exports__);
   },
   data: function data() {
     return {
-      categories: []
+      categories: [],
+      categoryList: []
     };
   },
   methods: {
+    changed: function changed(category) {
+      console.log(category, JSON.stringify(category.item), category.orig);
+      return JSON.stringify(category.item) !== category.orig;
+    },
     loadData: function loadData() {
       var _this = this;
 
@@ -95,12 +103,20 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     parseStuff: function parseStuff(data) {
+      this.categoryList = _.map(data, function (cat) {
+        return {
+          orig: JSON.stringify(cat),
+          item: cat
+        };
+      });
       this.categories = data;
     },
     save: function save(category, event) {
+      console.log(category);
       event.preventDefault();
-      axios.put('categories/' + category.id, category).then(function () {
-        return console.log(saved);
+      axios.put('categories/' + category.id, category).then(function (saved) {
+        category.item = saved;
+        category.orig = JSON.stringify(saved);
       });
     }
   },
@@ -207,8 +223,8 @@ var render = function() {
           staticClass: "list-group list-group-flush",
           staticStyle: { "max-height": "65vh", "overflow-y": "auto" }
         },
-        _vm._l(_vm.categories, function(category) {
-          return _c("li", { staticClass: "list-group-item" }, [
+        _vm._l(_vm.categoryList, function(category, $index) {
+          return _c("li", { key: $index, staticClass: "list-group-item" }, [
             _c("div", { staticClass: "row" }, [
               _c("div", { staticClass: "col-7" }, [
                 _c(
@@ -217,7 +233,7 @@ var render = function() {
                   [
                     _vm._v(
                       _vm._s(
-                        _vm._f("moment")(category.created_at, "DD.MM.YYYY")
+                        _vm._f("moment")(category.item.created_at, "DD.MM.YYYY")
                       ) + " | "
                     ),
                     _c(
@@ -226,11 +242,11 @@ var render = function() {
                         attrs: {
                           to: {
                             name: "show-by-category",
-                            params: { tag: category.tag }
+                            params: { tag: category.item.tag }
                           }
                         }
                       },
-                      [_vm._v(_vm._s(category.notes_count) + " notes ")]
+                      [_vm._v(_vm._s(category.item.notes_count) + " notes ")]
                     )
                   ],
                   1
@@ -252,7 +268,7 @@ var render = function() {
                     {
                       on: {
                         submit: function($event) {
-                          return _vm.save(category, $event)
+                          return _vm.save(category.item, $event)
                         }
                       }
                     },
@@ -264,11 +280,11 @@ var render = function() {
                             staticClass: "form-control",
                             attrs: { type: "text", required: "" },
                             model: {
-                              value: category.name,
+                              value: category.item.name,
                               callback: function($$v) {
-                                _vm.$set(category, "name", $$v)
+                                _vm.$set(category.item, "name", $$v)
                               },
-                              expression: "category.name"
+                              expression: "category.item.name"
                             }
                           })
                         ],
@@ -283,11 +299,15 @@ var render = function() {
                             "b-form-checkbox",
                             {
                               model: {
-                                value: category.props.addToLatest,
+                                value: category.item.props.addToLatest,
                                 callback: function($$v) {
-                                  _vm.$set(category.props, "addToLatest", $$v)
+                                  _vm.$set(
+                                    category.item.props,
+                                    "addToLatest",
+                                    $$v
+                                  )
                                 },
-                                expression: "category.props.addToLatest"
+                                expression: "category.item.props.addToLatest"
                               }
                             },
                             [
@@ -301,12 +321,40 @@ var render = function() {
                       ),
                       _vm._v(" "),
                       _c(
+                        "b-form-group",
+                        { attrs: { id: "input-group-4" } },
+                        [
+                          _c(
+                            "b-form-checkbox",
+                            {
+                              model: {
+                                value: category.item.props.hideFromSelect,
+                                callback: function($$v) {
+                                  _vm.$set(
+                                    category.item.props,
+                                    "hideFromSelect",
+                                    $$v
+                                  )
+                                },
+                                expression: "category.item.props.hideFromSelect"
+                              }
+                            },
+                            [_vm._v("Hide from select list")]
+                          )
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
                         "div",
                         { staticClass: "text-right" },
                         [
                           _c(
                             "b-button",
-                            { attrs: { type: "submit", variant: "primary" } },
+                            {
+                              class: { disabled: !_vm.changed(category) },
+                              attrs: { type: "submit", variant: "primary" }
+                            },
                             [_vm._v("Save")]
                           )
                         ],

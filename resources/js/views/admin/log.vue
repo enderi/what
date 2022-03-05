@@ -29,7 +29,7 @@
             New: {{newCategoryPlaceholder.tag}}
           </option>
           <option v-for="category in categories" :value="category.tag">
-            {{ category.name }}
+            {{ category.name }} ({{category.notes_count}})
           </option>
         </select>
       </div>
@@ -68,7 +68,11 @@ export default {
   mounted() {
     axios.get("info").then((resp) => {
       this.notes = resp.data.notes;
-      this.categories = resp.data.categories;
+      this.categories = _.chain(resp.data.categories)
+      .sortBy('notes_count')
+      .filter((f) => !f.props.hideFromSelect)
+      .reverse()
+      .valueOf();
     });
   },
   methods: {

@@ -268,7 +268,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
   axios.get("info").then(function (resp) {
     _this.notes = resp.data.notes;
-    _this.categories = resp.data.categories;
+    _this.categories = _.chain(resp.data.categories).sortBy('notes_count').filter(function (f) {
+      return !f.props.hideFromSelect;
+    }).reverse().valueOf();
   });
 }), _defineProperty(_components$name$moun, "methods", {
   submit: function submit() {
@@ -347,6 +349,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_Notes_AddComment_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../components/Notes/AddComment.vue */ "./resources/js/components/Notes/AddComment.vue");
 /* harmony import */ var _components_Notes_ListComments_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../components/Notes/ListComments.vue */ "./resources/js/components/Notes/ListComments.vue");
 /* harmony import */ var _log_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./log.vue */ "./resources/js/views/admin/log.vue");
+/* harmony import */ var _services_NoteService__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../services/NoteService */ "./resources/js/services/NoteService.js");
 //
 //
 //
@@ -407,6 +410,32 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
 
 
 
@@ -455,6 +484,8 @@ __webpack_require__.r(__webpack_exports__);
     parseStuff: function parseStuff(data) {
       this.notes = data.notes;
       this.categories = data.categories;
+      console.log(data, _services_NoteService__WEBPACK_IMPORTED_MODULE_3__.default);
+      (0,_services_NoteService__WEBPACK_IMPORTED_MODULE_3__.default)(data);
     },
     open: function open(note) {//axios.get("note/" + note.id);
     },
@@ -484,13 +515,34 @@ __webpack_require__.r(__webpack_exports__);
       note.comments.push(comment);
     },
     reloadAllComments: function reloadAllComments(note) {
-      axios.get('notes/' + note.id + '/comments').then(function (resp) {
-        console.log('notes', resp.data);
+      axios.get("notes/" + note.id + "/comments").then(function (resp) {
+        console.log("notes", resp.data);
         note.comments = resp.data;
       });
     }
   }
 });
+
+/***/ }),
+
+/***/ "./resources/js/services/NoteService.js":
+/*!**********************************************!*\
+  !*** ./resources/js/services/NoteService.js ***!
+  \**********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(rawNotes) {
+  var notesByUuid = [];
+
+  _.each(rawNotes.notes, function (n) {
+    return notesByUuid[n.uuid] = n;
+  });
+}
 
 /***/ }),
 
@@ -1298,7 +1350,11 @@ var render = function() {
                   _vm._l(_vm.categories, function(category) {
                     return _c("option", { domProps: { value: category.tag } }, [
                       _vm._v(
-                        "\n          " + _vm._s(category.name) + "\n        "
+                        "\n          " +
+                          _vm._s(category.name) +
+                          " (" +
+                          _vm._s(category.notes_count) +
+                          ")\n        "
                       )
                     ])
                   })
@@ -1365,7 +1421,7 @@ var render = function() {
               "card-header d-flex justify-content-between align-items-center"
           },
           [
-            _vm._v("Notes\n      "),
+            _vm._v("\n      Notes\n      "),
             _vm.tagFilter
               ? _c(
                   "div",
@@ -1387,24 +1443,27 @@ var render = function() {
             staticClass: "list-group list-group-flush",
             staticStyle: { "max-height": "65vh", "overflow-y": "auto" }
           },
-          _vm._l(_vm.filteredNotes, function(aNote) {
+          _vm._l(_vm.filteredNotes, function(aNote, $index) {
             return _c(
               "li",
-              { staticClass: "list-group-item pt-0 pb-0 pl-2 pr-2" },
+              {
+                key: $index,
+                staticClass: "list-group-item pt-0 pb-0 pl-2 pr-2"
+              },
               [
                 _c("div", { staticClass: "row" }, [
                   _c("div", { staticClass: "col-7" }, [
-                    _c("small", { staticClass: "text-muted" }, [
+                    _c("span", { staticClass: "text-muted" }, [
                       _vm._v(
                         _vm._s(
                           _vm._f("moment")(aNote.created_at, "DD.MM.YYYY")
-                        ) + "\n                "
+                        ) + "\n              "
                       ),
                       aNote.category
                         ? _c(
                             "span",
                             [
-                              _vm._v("| "),
+                              _vm._v("|\n                "),
                               _c(
                                 "router-link",
                                 {
@@ -1415,7 +1474,12 @@ var render = function() {
                                     }
                                   }
                                 },
-                                [_vm._v(" " + _vm._s(aNote.category.name))]
+                                [
+                                  _vm._v(
+                                    "\n                  " +
+                                      _vm._s(aNote.category.name)
+                                  )
+                                ]
                               )
                             ],
                             1
@@ -1431,7 +1495,36 @@ var render = function() {
                       _c(
                         "a",
                         {
-                          staticClass: "btn btn-link p-1 text-danger",
+                          staticClass: "btn btn-link",
+                          on: {
+                            click: function($event) {
+                              return _vm.commentNote(aNote)
+                            }
+                          }
+                        },
+                        [
+                          _c(
+                            "div",
+                            {
+                              staticClass:
+                                "badge badge-pill badge-outline-info text-secondary"
+                            },
+                            [
+                              _c("i", { staticClass: "fa fa-comment" }),
+                              _vm._v(
+                                " " +
+                                  _vm._s(aNote.comments.length) +
+                                  "\n              "
+                              )
+                            ]
+                          )
+                        ]
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "a",
+                        {
+                          staticClass: "btn btn-link text-danger",
                           on: {
                             click: function($event) {
                               return _vm.deleteNote(aNote)
@@ -1442,22 +1535,9 @@ var render = function() {
                       ),
                       _vm._v(" "),
                       _c(
-                        "a",
-                        {
-                          staticClass: "btn btn-link p-1",
-                          on: {
-                            click: function($event) {
-                              return _vm.commentNote(aNote)
-                            }
-                          }
-                        },
-                        [_c("i", { staticClass: "fa fa-comment" })]
-                      ),
-                      _vm._v(" "),
-                      _c(
                         "router-link",
                         {
-                          staticClass: "btn btn-link p-1",
+                          staticClass: "btn btn-link",
                           attrs: {
                             to: { name: "editNote", params: { id: aNote.id } }
                           }
@@ -1466,10 +1546,23 @@ var render = function() {
                       )
                     ],
                     1
-                  ),
-                  _vm._v(" "),
+                  )
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "row" }, [
                   _c("div", { staticClass: "col-12" }, [
-                    _c("p", [_vm._v(_vm._s(aNote.text))])
+                    _c(
+                      "p",
+                      {
+                        staticClass: "text-primary",
+                        on: {
+                          click: function($event) {
+                            return _vm.commentNote(aNote)
+                          }
+                        }
+                      },
+                      [_vm._v(_vm._s(aNote.text))]
+                    )
                   ])
                 ]),
                 _vm._v(" "),
