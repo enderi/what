@@ -4,10 +4,11 @@
     <div class="card mt-1">
       <div
         class="card-header d-flex justify-content-between align-items-center"
+        style="padding-top:5px;padding-bottom:5px;"
       >
         Notes
         <div class="" v-if="tagFilter">
-          <span class="btn btn-link" @click="deselectCategory()">Show all</span>
+          <span class="btn btn-link no-padding" @click="deselectCategory()">Show all</span>
         </div>
       </div>
       <ul
@@ -24,12 +25,11 @@
               <span class="text-muted"
                 >{{ aNote.created_at | moment("DD.MM.YYYY") }}
                 <span v-if="aNote.category"
-                  >|&nbsp;<span v-if="aNote.category.props.hideFromSelect">{{ aNote.category.name }}</span>
+                  >|&nbsp;
+                  <span v-if="aNote.category.props.hideFromSelect">{{ aNote.category.name }}</span>
                   <span v-if="!aNote.category.props.hideFromSelect"
                     @click="selectCategory(aNote.category)"
-                    class="btn btn-link">
-                    {{ aNote.category.name }}
-                  </span>
+                    class="btn btn-link no-padding">{{ aNote.category.name }}</span>
                 </span>
               </span>
             </div>
@@ -72,6 +72,11 @@
     </div>
   </div>
 </template>
+<style scoped>
+.no-padding{
+  padding:0;
+}
+</style>
 
 <script>
 import AddComment from "../../components/Notes/AddComment.vue";
